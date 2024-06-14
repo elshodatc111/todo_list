@@ -11,23 +11,9 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
-  List todos = [];
 
-  void getAllTodos() {
-    setState(() {
-        todos = StoregeServise.get('todos');
-      },
-    );
-  }
 
-  void removeTodo(int index){
-    todos = StoregeServise.get('todos');
-    todos.removeAt(index);
-    StoregeServise.put('todos', todos);
-    setState(() {
 
-    });
-  }
 
   @override
   void initState() {
@@ -45,7 +31,7 @@ class _ToDoListState extends State<ToDoList> {
         padding: const EdgeInsets.all(16.0),
         child: RefreshIndicator(
           onRefresh: () async {
-            print("Refresh");
+            getAllTodos();
           },
           child: ListView.builder(
             itemCount: todos.length,
