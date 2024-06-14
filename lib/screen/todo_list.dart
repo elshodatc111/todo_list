@@ -1,63 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list_app/screen/add_todo_page.dart';
 import 'package:get/get.dart';
-import 'package:todo_list_app/servise/storege_servise.dart';
+import 'package:todo_list_app/screen/todos_provider.dart';
 
-class ToDoList extends StatefulWidget {
+class ToDoList extends StatelessWidget {
   const ToDoList({super.key});
 
   @override
-  State<ToDoList> createState() => _ToDoListState();
-}
-
-class _ToDoListState extends State<ToDoList> {
-
-
-
-
-  @override
-  void initState() {
-    getAllTodos();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("ToDo App"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            getAllTodos();
-          },
-          child: ListView.builder(
-            itemCount: todos.length,
-            itemBuilder: (context, index) {
-              var todo = todos[index];
-              return TodoList(
-                index: index,
-                title: "${todo['title']}",
-                description: "${todo['description']}",
-                onDelete: () {
-                  removeTodo(index);
-                },
-              );
-            },
+    return ChangeNotifierProvider(
+      create: (context)=>TodosProvider(),
+      builder: (context, child){
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("ToDo App"),
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        onPressed: () async{
-          await Get.to(() => AddTodoPaga());
-          getAllTodos();
-        },
-        child: Icon(Icons.add),
-      ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                context.read<TodosProvider>().getAllTodos();
+              },
+              child: ListView.builder(
+                itemCount: context.watch<TodosProvider>().todos.length,
+                itemBuilder: (context, index) {
+                  var todo = context.watch<TodosProvider>().todos[index];
+                  return TodoList(
+                    index: index,
+                    title: "${todo['title']}",
+                    description: "${todo['description']}",
+                    onDelete: () {
+                      context.read<TodosProvider>().removeTodo(index);
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            onPressed: () async{
+              await Get.to(() => AddTodoPaga());
+              context.read<TodosProvider>().getAllTodos();
+            },
+            child: Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 }
