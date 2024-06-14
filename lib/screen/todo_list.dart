@@ -15,9 +15,19 @@ class _ToDoListState extends State<ToDoList> {
 
   void getAllTodos() {
     setState(() {
-      todos = StoregeServise.get('todos');
-      print(todos);
-    },);}
+        todos = StoregeServise.get('todos');
+      },
+    );
+  }
+
+  void removeTodo(int index){
+    todos = StoregeServise.get('todos');
+    todos.removeAt(index);
+    StoregeServise.put('todos', todos);
+    setState(() {
+
+    });
+  }
 
   @override
   void initState() {
@@ -33,28 +43,32 @@ class _ToDoListState extends State<ToDoList> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: 10,
-          itemBuilder: (context, index) {
-            var todo = todos[index];
-            return TodoList(
-              index: index,
-              title: "${todo['title']}",
-              description: "${todo['description']}",
-              onDelete: (){
-                setState(() {
-                  todo.removeAt(index);
-                });
-              },
-            );
+        child: RefreshIndicator(
+          onRefresh: () async {
+            print("Refresh");
           },
+          child: ListView.builder(
+            itemCount: todos.length,
+            itemBuilder: (context, index) {
+              var todo = todos[index];
+              return TodoList(
+                index: index,
+                title: "${todo['title']}",
+                description: "${todo['description']}",
+                onDelete: () {
+                  removeTodo(index);
+                },
+              );
+            },
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
-        onPressed: () {
-          Get.to(() => AddTodoPaga());
+        onPressed: () async{
+          await Get.to(() => AddTodoPaga());
+          getAllTodos();
         },
         child: Icon(Icons.add),
       ),

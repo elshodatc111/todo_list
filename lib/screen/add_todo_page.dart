@@ -20,7 +20,7 @@ class _AddTodoPagaState extends State<AddTodoPaga> {
       print('Malumotlar yetarli emas');
       return;
     }
-    List todos = StoregeServise.get('todos') ?? [];
+    List todos = StoregeServise.get('todos')??[];
     todos.add(
       {
         'title': title,
